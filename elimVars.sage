@@ -7,6 +7,11 @@ def elimVars(G,Q,B,P_values=None):
 	elim=elimVarsinternal(root,dirgraph)
 	return elim
 
+#Given a directed graph and a node i, this recursively calls to get the variable reduced
+#equations from all the node's children. It then uses resultants to eliminate the variables a_{i,j}
+#for each child j. Finally, it eliminates R_i and returns the equations
+#If the node passed is the root, is returns a list of the resulting equation for each child of the root
+#This method also adds an attribute res_eq to each node in the dirgraph that displays what polynomial it passed
 def altElim(dirgraph,node):
 	i = node.label
 	if i==0:
@@ -24,19 +29,22 @@ def altElim(dirgraph,node):
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 
 		g_eq = g_eq.resultant(r_eq,R[i])
+		node.res_eq = g_eq
 		return g_eq
 
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
-#It then finds the roots of said polynomial
+#It then finds the roots of said polynomial and returns them
 def convert_poly(f):
 	var = f.variables()[0]
 	degr = f.degree()
-	C.<x> = PolynomialRing(RR)
+	R.<x> = PolynomialRing(RR)
 	g = f.constant_coefficient()
 	for i in range(1,degr+1):
-		g = g + CC(f.coefficient(var^i))*x^i
+		g = g + RR(f.coefficient(var^i))*x^i
 	return g.roots()
 
+#Given a directed graph with some susceptances and P values, 
+#this returns a matrix beta whose i,j entry is the value of beta_{i,j}
 def beta_vals(dirgraph):
 	B = dirgraph.B
 	n = B.ncols()
