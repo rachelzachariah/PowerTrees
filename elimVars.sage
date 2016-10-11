@@ -7,16 +7,49 @@ def elimVars(G,Q,B,P_values=None):
 	elim=elimVarsinternal(root,dirgraph)
 	return elim
 
+def altElim(dirgraph,node):
+	i = node.label
+	if i==0:
+		elim_eqs = [altElim(dirgraph,child) for child in node.children]
+		return elim_eqs
+	else:
+		g_eq = node.q_eq
+		h_eq = node.h_eq
+
+		for child in node.children:
+			j = child.label
+			elim_eq = altElim(dirgraph,child)
+			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
+
+		g_eq = g_eq.resultant(h_eq,R[i])
+		return g_eq
+
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
 #It then finds the roots of said polynomial
 def convert_poly(f):
 	var = f.variables()[0]
 	degr = f.degree()
-	R.<x> = PolynomialRing(RR)
+	C.<x> = PolynomialRing(RR)
 	g = f.constant_coefficient()
 	for i in range(1,degr+1):
-		g = g + RR(f.coefficient(var^i))*x^i
+		g = g + CC(f.coefficient(var^i))*x^i
 	return g.roots()
+
+def beta_vals(dirgraph):
+	B = dirgraph.B
+	n = B.ncols()
+	beta = Matrix(RR,n,n)
+	for i in range(1,n):
+		curr_v = dirgraph.nodes[i]
+		parent_v = curr_v.parent
+		j = parent_v.label
+		P_sum = curr_v.p_value
+		for child in curr_v.children:
+			P_sum += child.p_value
+		beta[i,j] = P_sum/(-B[i,j])
+		beta[j,i] = -beta[i,j]
+	return beta
+
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 
 #alpha_ij with its children. 
