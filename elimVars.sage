@@ -14,14 +14,14 @@ def altElim(dirgraph,node):
 		return elim_eqs
 	else:
 		g_eq = node.q_eq
-		h_eq = node.h_eq
+		r_eq = node.r_eq
 
 		for child in node.children:
 			j = child.label
 			elim_eq = altElim(dirgraph,child)
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 
-		g_eq = g_eq.resultant(h_eq,R[i])
+		g_eq = g_eq.resultant(r_eq,R[i])
 		return g_eq
 
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
