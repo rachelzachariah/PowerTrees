@@ -13,6 +13,8 @@ def altElim(dirgraph,node):
 		elim_eqs = [altElim(dirgraph,child) for child in node.children]
 		return elim_eqs
 	else:
+		R = dirgraph.R
+		A = dirgraph.A
 		g_eq = node.q_eq
 		r_eq = node.r_eq
 
