@@ -54,7 +54,7 @@ def power_eqs_ar(G,Q,B,P=None):
 	dirgraph.U = U
 	root = Node(0,0,0)
 	dirgraph.add_node(root)
-	populate_node(root,dirgraph,adj_mx)
+	populate_node(root,dirgraph,adj_mx,P=P)
 
 	q_eqs = [] #These will be the Q equations
 	r_eqs = [] #These equations give the relations a_{i,j}^2 = R_iR_j
