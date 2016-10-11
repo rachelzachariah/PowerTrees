@@ -145,7 +145,7 @@ def populate_node(node, dirgraph, adjacency_matrix, P=None):
 			chld.add_parent(node) 
 			dirgraph.add_node(chld) #update the node-holder
 			node.add_child(chld) #update the node
-			populate_node(chld,dirgraph,adjacency_matrix)
+			populate_node(chld,dirgraph,adjacency_matrix,P=P)
 	#set node's Q-eqn that has been built now
 	node.q_eq=q #set node's Q-eqn that has been built now
 
