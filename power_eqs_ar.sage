@@ -1,7 +1,7 @@
 #This function takes as input a graph G and a list Q of Q_i values
 #It returns the equations in terms of alpha_{i,j} and R_i
 import numpy
-def power_eqs_ar(G,Q,B):
+def power_eqs_ar(G,Q,B,P=None):
 	adj_mx = G.adjacency_matrix() #We compute the adjacency matrix of G
 	n = len(G) #This is the number of buses
 	dirgraph = DirGraph() 
@@ -116,13 +116,13 @@ def power_eqs_ar(G,Q,B):
 #populate_node adds nodes beginning with "node" and recursively fills in their parents, children 
 # Q-eqns and R-eqns based on adjacency_matrix.
 
-def populate_node(node, dirgraph, adjacency_matrix):
+def populate_node(node, dirgraph, adjacency_matrix, P=None):
 	A = dirgraph.A
 	B = dirgraph.B
 	R = dirgraph.R
 	S = dirgraph.S
 	U = dirgraph.U
-	i = node.label 
+	i = node.label
 	q=0
 	#the node's parent (if any) is dealt with first
 	if node.has_parent():
@@ -148,6 +148,14 @@ def populate_node(node, dirgraph, adjacency_matrix):
 			populate_node(chld,dirgraph,adjacency_matrix)
 	#set node's Q-eqn that has been built now
 	node.q_eq=q #set node's Q-eqn that has been built now
+
+
+	#Add a P value to the node
+	#If no P values are input, it defaults to lossless
+	if P:
+		node.p_value = P[i]
+	else:
+		node.p_value = 0
 
 	return
 

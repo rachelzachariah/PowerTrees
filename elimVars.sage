@@ -1,11 +1,22 @@
 #elimVars eliminates variables to give univariate equations for the tree-system
 #one univariate equation for each child of the root.
 
-def elimVars(G,Q,B):
-	dirgraph = power_eqs_ar(G,Q,B) #initalize req structures
+def elimVars(G,Q,B,P_values=None):
+	dirgraph = power_eqs_ar(G,Q,B,P=P_values) #initalize req structures
 	root=dirgraph.nodes[0]
 	elim=elimVarsinternal(root,dirgraph)
 	return elim
+
+#Converts a polynomial in a real multivariate ring to a real univariate polynomial
+#It then finds the roots of said polynomial
+def convert_poly(f):
+	var = f.variables()[0]
+	degr = f.degree()
+	R.<x> = PolynomialRing(RR)
+	g = f.constant_coefficient()
+	for i in range(1,degr+1):
+		g = g + RR(f.coefficient(var^i))*x^i
+	return g.roots()
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 
 #alpha_ij with its children. 
