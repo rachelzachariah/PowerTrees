@@ -128,7 +128,7 @@ def populate_node(node, dirgraph, adjacency_matrix, P=None):
 	if node.has_parent():
 		parent = node.parent  
 		j = parent.label 
-		q = B[i,j]*(R[i]- A[i,j]) -Q[i] #parent's contribution to Q-eqn 
+		q = B[i,j]*(R[i]- A[i,j]) + Q[i] #parent's contribution to Q-eqn 
 		node.r_eq = A[i,j]^2-R[i]*R[j] #input R-eqn between node and parent
 
 	n=len(numpy.array(adjacency_matrix)) #number of nodes
