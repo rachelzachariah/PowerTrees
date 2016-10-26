@@ -41,7 +41,7 @@ def convert_poly(f):
 	g = f.constant_coefficient()
 	for i in range(1,degr+1):
 		g = g + RR(f.coefficient(var^i))*x^i
-	return g.roots()
+	return g
 
 #Given a directed graph with some susceptances and P values, 
 #this returns a matrix beta whose i,j entry is the value of beta_{i,j}
