@@ -1,0 +1,218 @@
+\documentclass[10pt, a4paper, twoside]{article}
+\usepackage{amsthm, amsmath, amssymb, amsfonts, algpseudocode, cite, multicol}
+\usepackage{anysize}
+%\usepackage[margin=1in]{geometry}
+
+\marginsize{3 cm}{3 cm}{1 cm}{2 cm}
+
+\begingroup
+    \makeatletter
+    \@for\theoremstyle:=definition,remark,plain\do{%
+        \expandafter\g@addto@macro\csname th@\theoremstyle\endcsname{%
+            \addtolength\thm@preskip\parskip
+            }%
+        }
+\endgroup
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\numberwithin{equation}{section}
+\newtheorem{cor}{Corollary}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{algorithm}{Algorithm}
+
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section]
+\newtheorem{example}{Example}[section]
+
+\usepackage{parskip}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\ratl}{\mathbb{Q}}
+\newcommand{\natl}{\mathbb{N}}
+\newcommand{\ints}{\mathbb{Z}}
+\newcommand{\field}{\mathbb{F}}
+\newcommand{\cmp}{\mathbb{C}}
+\newcommand{\maxl}{\mathfrak{m}}
+\newcommand{\pideal}{\mathfrak{p}}
+\newcommand{\im}{\text{Im}}
+\newcommand{\expect}{\mathbb{E}}
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\ok}{\mathcal{O}_K}
+\newcommand{\res}{\text{res}}
+
+\title{Finding all voltage solutions to tree distribution networks}
+\author{}
+\date{}
+
+%\voffset = -0.2in
+%\addtolength{\oddsidemargin}{-.875in}
+%\addtolength{\evensidemargin}{-.875in}
+%\addtolength{\textwidth}{1.75in}
+%\addtolength{\topmargin}{-.8in}
+%\addtolength{\textheight}{1.75in}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{Power Trees}
+\fancyhead[RE,LO]{\thepage}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We present an algorithm that finds all voltage solutions to the power flow equations on trees. We prove that this algorithm will find all real solutions. Moreover, the algorithm finds a univariate polynomial whose roots govern the voltages of the entire tree. We give versions of this algorithm for both the lossless case and the loss case. We also bound the complexity of the algorithm in terms of the max degree of the network. We use this to show that in physically motivated radial networks, our algorithm runs much faster than in the worst-case, scaling more like the number of real solutions.\end{abstract}
+
+\section{Introduction}
+
+\section{Preliminaries}
+
+We consider an $n$ bus electric power system. We label the buses as $1,\ldots, n$. The topology of the network is given by an graph $G$ and an admittance matrix $Y = G+jB$ where $j = \sqrt{-1}$. The system is {\it lossless} if $G = 0$. Each bus $i$ has an associated power injection given by $P_i + jQ_i$, $P_i, Q_i \in \real$. The bus also has voltage phasor $x_i +jy_i$ with $x_i, y_i \in \real$. We make a choice of {\it slack bus} in the system which provides a reference voltage angle. In our setup, we let bus $1$ be the slack bus, with $x_1 = 1, y_1 = 0$. The $PQ$ equations for power flow are then given by:
+
+\begin{equation}
+\sum_{k=1}^n G_{i,k}(x_i^2+y_i^2-x_ix_k-y_iy_k) + B_{ik}(x_ky_i-x_iy_k) = P_i
+\end{equation}
+\begin{equation}
+\sum_{k=1}^n -B_{ik}(x_i^2+y_i^2-x_ix_k-y_iy_k) +G_{ik}(x_ky_i-x_iy_k) = Q_i
+\end{equation}
+
+We will consider $G$ a directed rooted tree with the slack bus the root and edges pointing away from the root. For a vertex $v$, let $p(v)$ denote the parent of a bus that isn't the slack bus, and let $c(v)$ denote all children of a vertex $v$.
+
+\subsection{Lossless}
+
+Note that in the case that we are lossless, the equations become:
+\begin{equation}
+f_i = \sum_{k=1}^n B_{ik}(x_ky_i-x_iy_k)-P_i=0
+\end{equation}
+\begin{equation}
+g_i = \sum_{k=1}^n -B_{ik}(x_i^2+y_i^2-x_ix_k-y_iy_k)-Q_i=0
+\end{equation}
+
+Note that if we let $\alpha_{ik} = x_ix_k+y_iy_k, \beta_{ik} = x_ky_i-x_iy_k$, $R_i = x_i^2+y_i^2$, this becomes:
+\begin{equation}
+f_i = \sum_{k=1}^n B_{ik}\beta_{ik}-P_i = 0
+\end{equation}
+\begin{equation}
+g_i = \sum_{k=1}^n -B_{ik}(R_i-\alpha_{ik}) - Q_i =0
+\end{equation}
+
+To solve the $PQ$ equations, we will use resultants from elimination theory. Let $f = a_dy^d + a_{d-1}y^{d-1} + \ldots + a_0, g = b_ey^e+b_{e-1}y^{e-1}+\ldots+b_0 \in \real[x_1,\ldots, x_m,y]$, so that the $a_i, b_j$ are in $\real[x_1,\ldots, x_m]$. Then the {\it Sylvester matrix} of $f$ and $g$ with respect to $y$ is a $(d+e)\times(d+e)$ matrix in $\real[x_1,\ldots, x_m]$ whose entries are formed as follows:
+
+Fill the matrix by starting in the upper-left corner and filling in the coefficients of $y$ in $f$ (in decreasing order of power of $y$). Form the second row by shifting the entries down one and across by one. Repeat until the coefficient $a_0$ is in the right-most entry of a row. Do the same with the coefficients of $g$.
+
+For example, if $f = a_4x^4+a_3x^3+a_2x^2+a_1x+a_0, g = b_2x^2+b_1x+b_0$, the Sylvester matrix with respect to $x$ is:
+\begin{align*}
+\begin{pmatrix}
+a_4 & a_3 & a_2 & a_1 & a_0 & 0\\
+0 & a_4 & a_3 & a_2 & a_1 & a_0\\
+b_2 & b_1 & b_0 & 0 & 0 & 0\\
+0 & b_2 & b_1 & b_0 & 0 & 0\\
+0 & 0 & b_2 & b_1 & b_0 & 0\\
+0 & 0 & 0 & b_2 & b_1 & b_0\end{pmatrix}
+\end{align*}
+
+The resultant of $f,g$ with respect to $y$, denoted $\res_y(f,g)$ is then the determinant of the associated Sylvester matrix. Note that if $f,g \in \real[x_1,\ldots, x_m,y]$, then $\res_y(f,g) \in \real[x_1,\ldots,x_m]$. Moreover, resultants satisfy the following useful fact. For $z_1,\ldots, z_m \in \real$, $z_1,\ldots, z_m$ is a root of $\res_y(f,g)$ iff there is some $z \in \real$ such that $(z_1,\ldots, z_m,z)$ is a common zero of $f$ and $g$. Informally, $\res_y(f,g)$ eliminates the variable $y$ in the two equations.
+
+It has been known for decades that one can in theory use iterated resultants to reduce multivariate equations to univariate equations, and then solve. Unfortunately, for generic systems of equations, this algorithm has a high time complexity since a given variable $y$ must be eliminated from all equations. The number of resultants needed increases, as does the resulting degrees of the next stage of polynomials (since performing a resultant generally increases the degree).
+
+Our main contribution comes from showing that in the case of power flow equations for a tree network, both the structure of the equations and topology of the graph allow us to significantly reduce the cost of this kind of approach. Moreover, we can guarantee that this method will require even fewer resultant computations if the tree has small average degree.
+
+\section{Algorithm}
+
+We first motivate and present the algorithm in the lossless setting. 
+Recall that in the case that we are lossless, the equations become:
+\begin{align*}
+\sum_{k=1}^n B_{ik}(x_ky_i-x_iy_k) &= P_i\\
+\sum_{k=1}^n B_{ik}(x_i^2+y_i^2-x_ix_k-y_iy_k) &= -Q_i
+\end{align*}
+
+We let $\alpha_{ik} = x_ix_k+y_iy_k, \beta_{ik} = x_ky_i-x_iy_k$, $R_i = x_i^2+y_i^2$. Note that $\alpha_{ik} = \alpha_{ki}$ and $\beta_{ik} = -\beta_{ki}$. Taking the sum over edges of $G$, this becomes:
+\begin{align*}
+B_{ip(i)}\beta_{ip(i)} + \sum_{k \in c(i)}^n B_{ik}\beta_{ik} = P_i\\
+B_{ip(i)}(R_i-\alpha_{ip(i)}) + \sum_{k=1}^n B_{ik}(R_i-\alpha_{ik}) = -Q_i
+\end{align*}
+
+We also include the easily-verified identities:
+\begin{align*}
+\alpha_{ik}^2+\beta_{ik}^2 = R_iR_k
+\end{align*}
+
+Note that if we solve for $\alpha_{ik}, \beta_{ik}, R_i$ for all $(i,k) \in E$, we will have solved for all $x_i, y_i$. To see this, first consider any bus $i$ connected to the slack bus $1$. Since $x_1 = 1, y_1 = 0$, we find that $\alpha_{i1} = x_i, \beta_{i1} = y_i$. More generally, if we have values for $\beta_{ik}, x_k, y_k$ and $(i,k) \in E$, then we can use linear algebra to solve for $x_i, y_i$ by using equations:
+\begin{align*}
+\alpha_{ik} = x_ix_k+y_iy_k\\
+\beta_{ik} = x_ky_i-x_iy_k\end{align*}
+
+In the case that $G$ is a tree, note that we can then start at the slack bus and propogate down the tree to solve for $x_i, y_i$ given values of $\alpha_{ik}, \beta_{ik}$.
+
+This change of variables has advantages over the $x,y$ coordinates. Under this formulation, we have the following lemma that we can use to solve for the $\beta_{ik}$.
+
+\begin{lemma}\label{beta_vals}
+For buses $i,k$, we write $i \to k$ if there is a path from $i$ to $k$ in the directed rooted tree $G$. Note that this is equivalent to saying that $k$ is a descendant of $i$. The $\beta_{ik}$ satisfy the following recursive identity:
+\begin{equation}
+B_{ip(i)}\beta_{ip(i)} = \sum_{i \to k} P_k
+\end{equation}\end{lemma}
+\begin{proof}
+If $i$ is a leaf, this equation is a restatement of the $P$ equation above. Otherwise, we rearrange the $P$ equation to get:
+\begin{align*}
+B_{ip(i)}\beta_{ip(i)} &= P_i - \sum_{k \in c(i)}B_i\beta_{ik}\\
+&= P_i - \sum_{k\in c(i)}B_i\beta_{ki}\\
+&= P_i + \sum_{k\in c(i)}B_i\beta_{kp(k)}\\
+&= P_i + \sum_{k\in c(i)}\sum_{k\to \ell} P_\ell\\
+&= \sum_{i \to k} P_k
+\end{align*}
+\end{proof}
+
+Therefore, we can solve for the $\beta_{ik}$ in linear time using a recursive algorithm. We now wish to solve for the $\alpha_{ik}, R_i$. We can treat the $\beta_{ik}$ as constants by the above. We will solve by using elimination of variables to reduce this question to solving a univariate polynomial.
+
+We first start with an example. Say that we have the following graph:
+
+%%%%%Insert graph%%%%
+
+Consider the equations at a leaf node $i$. Then the $Q$ equation and the associated identities above give us the equations:
+\begin{align*}
+B_{n,n-1}(R_n-\alpha_{n,n-1}) = P_n\\
+\alpha_{n,n-1}^2+\beta_{n,n-1}^2 = R_nR_{n-1}\end{align*}
+
+Note that these are the only equations in which $R_i$ appears due to the topology of the graph. To eliminate $R_i$, we need only use the equations above to substitute, which leads to the new equation:
+\begin{equation}\label{eq:chain_example}
+B_{n,n-1}(\alpha_{n,n-1}^2+\beta_{n,n-1}^2-\alpha_{n,n-1}R_{n-1}) = P_nR_{n-1}\end{equation}
+
+Looking at the $Q$ equation of bus $j$, we get:
+\begin{align*}
+B_{n-1,n-2}(R_{n-1}-\alpha_{n-1,n-2}) + B_{n-1,n}(R_{n-1}-\alpha_{n,n-1}) = Q_{n-1}\end{align*}
+
+Note that this is linear in $\alpha_{ij}$. Therefore we can solve for $\alpha_{ij}$ and substitute in to \ref{eq:chain_example}. The result is an equation with variables $\alpha_{jk}, R_j$. Hence, we've eliminated $\alpha_{ij}, R_i$. By iterating this procedure, we can eventually eliminate all variables except $\alpha_{12} = x_2$. Solving this polynomial, we get all possible values of $x_2$. Since we can use 
+
+
+\section{Complexity}
+
+Let $G$ be a graph representing our network. We wish to determine how many resultants we need to compute 
+
+\section{Empirical Results}
+
+\section{Conclustion}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
