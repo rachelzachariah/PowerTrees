@@ -28,6 +28,8 @@ def altElim(dirgraph,node):
 			elim_eq = altElim(dirgraph,child)
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 			g_eq = g_eq/(gcd(g_eq.coefficients()))
+			if i==1 and j==3:
+				print g_eq
 
 		g_eq = g_eq.resultant(r_eq,R[i])
 		g_eq = g_eq/(gcd(g_eq.coefficients()))
