@@ -28,13 +28,23 @@ def altElim(dirgraph,node):
 			elim_eq = altElim(dirgraph,child)
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 			g_eq = g_eq/(gcd(g_eq.coefficients()))
-			if i==1 and j==3:
-				print g_eq
 
 		g_eq = g_eq.resultant(r_eq,R[i])
 		g_eq = g_eq/(gcd(g_eq.coefficients()))
 		node.res_eq = g_eq
 		return g_eq
+
+def altSolve(dirgraph,node):
+	final_eqs = altElim(dirgraph,node)
+	solutions = []
+	for f in final_eqs:
+		g = convert_poly(f)
+		g_roots = g.roots()
+
+
+
+
+
 
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
 #It then finds the roots of said polynomial and returns them
@@ -46,23 +56,6 @@ def convert_poly(f):
 	for i in range(1,degr+1):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
-
-#Given a directed graph with some susceptances and P values, 
-#this returns a matrix beta whose i,j entry is the value of beta_{i,j}
-def beta_vals(dirgraph):
-	B = dirgraph.B
-	n = B.ncols()
-	beta = Matrix(RR,n,n)
-	for i in range(1,n):
-		curr_v = dirgraph.nodes[i]
-		parent_v = curr_v.parent
-		j = parent_v.label
-		P_sum = curr_v.p_value
-		for child in curr_v.children:
-			P_sum += child.p_value
-		beta[i,j] = P_sum/(-B[i,j])
-		beta[j,i] = -beta[i,j]
-	return beta
 
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 

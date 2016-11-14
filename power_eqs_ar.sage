@@ -56,6 +56,9 @@ def power_eqs_ar(G,Q,B,P=None):
 	dirgraph.add_node(root)
 	populate_node(root,dirgraph,adj_mx,P=P)
 
+
+	beta = beta_vals(dirgraph) #This solves for the beta_{i,j} values
+
 	q_eqs = [] #These will be the Q equations
 	r_eqs = [] #These equations give the relations a_{i,j}^2 = R_iR_j
 
@@ -80,7 +83,7 @@ def power_eqs_ar(G,Q,B,P=None):
 				#we get the equation A[i,j]**2 - R[i]*1
 				if j < i:
 					#We add the R equation to the list of R equations
-					r_eqs.append(A[i,j]**2-R[i]*R[j])
+					r_eqs.append(A[i,j]**2+beta[i,j]-R[i]*R[j])
 
 		#We've now added all relevant parts to the Q equation, so we add it to the list of Q equations		
 		q_eqs.append(q_eq)
@@ -92,6 +95,8 @@ def power_eqs_ar(G,Q,B,P=None):
 	dirgraph.eqs = eqs 
 
 	return dirgraph
+
+
 
 #If you want to use this method, you might do the following in sage:
 
@@ -159,6 +164,23 @@ def populate_node(node, dirgraph, adjacency_matrix, P=None):
 
 	return
 
+
+#Given a directed graph with some susceptances and P values, 
+#this returns a matrix beta whose i,j entry is the value of beta_{i,j}
+def beta_vals(dirgraph):
+	B = dirgraph.B
+	n = B.ncols()
+	beta = Matrix(RR,n,n)
+	for i in range(1,n):
+		curr_v = dirgraph.nodes[i]
+		parent_v = curr_v.parent
+		j = parent_v.label
+		P_sum = curr_v.p_value
+		for child in curr_v.children:
+			P_sum += child.p_value
+		beta[i,j] = P_sum/(-B[i,j])
+		beta[j,i] = -beta[i,j]
+	return beta
 
 
 
