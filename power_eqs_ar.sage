@@ -83,7 +83,7 @@ def power_eqs_ar(G,Q,B,P=None):
 					#We add the R equation to the list of R equations
 					r_eq = A[i,j]**2+beta[i,j]**2-R[i]*R[j]
 					r_eqs.append(r_eq)
-					dirgrpah.nodes[i].r_eq = r_eq
+					dirgraph.nodes[i].r_eq = r_eq
 
 		#We've now added all relevant parts to the Q equation, so we add it to the list of Q equations		
 		q_eqs.append(q_eq)
