@@ -14,7 +14,6 @@ def elimVars(G,Q,B,P_values=None):
 #This method also adds an attribute res_eq to each node in the dirgraph that displays what polynomial it passed
 def altElim(dirgraph,node):
 	i = node.label
-	print "i = "+str(i)
 	if i==0:
 		elim_eqs = [altElim(dirgraph,child) for child in node.children]
 		return elim_eqs
@@ -26,12 +25,9 @@ def altElim(dirgraph,node):
 
 		for child in node.children:
 			j = child.label
-			print "j = " + str(j)
 			elim_eq = altElim(dirgraph,child)
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 			g_eq = g_eq/(gcd(g_eq.coefficients()))
-			if i==1 and j==3:
-				print g_eq
 
 		g_eq = g_eq.resultant(r_eq,dirgraph.R[i])
 		g_eq = g_eq/(gcd(g_eq.coefficients()))
@@ -49,17 +45,66 @@ def convert_poly(f):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
 
-def alt_solve(dirgraph,node):
+def alt_solve(dirgraph,root):
 	final_eqs = altElim(dirgraph,node)
 
-	for f in final_eqs:
+	sol_amalg = []
+
+	for node in root.children:
+
+		branch_solutions = []
+		f = node.res_eq
 		g = convert_poly(f)
 		g_roots = g.roots()
 		num_roots = len(g_roots)
-		solutions = []
 		for i in range(num_roots):
-			d = {}
-			d[f.variables()[0]] = g_roots[i]
+			sol_dict = {}
+			sol_dict[f.variables()[0]] = g_roots[i][0]
+
+			to_visit = [node] #We perform a breadth-first search on the tree
+			for child in node.children:
+				to_visit.append(child)
+
+			while len(to_visit) > 0:
+				node = to_visit[0]
+				to_visit.remove(node)
+
+				sol_dict = update_sol(node,sol_dict)
+				if sol_dict==None:
+					return "No solution"
+
+			branch_solutions.append(sol_dict)
+		sol_amalg.append(branch_solutions)
+	return sol_amalg
+
+def update_sol(node,sol_dict):
+	child_solutions = []
+	child_vars = []
+
+	for child in node.children:
+		f_child = child.res_eq
+		f_child_sub = f_child.subs(sol_dict)
+		g_child = convert_poly(f_child_subs)
+		child_roots = g_child.roots()
+		child_solutions.append(child_roots)
+		child_vars.append(g_child.variables()[0])
+
+	curr_q_eq = (node.q_eq).subs(sol_dict)
+	num_children = len(child_roots)
+	prod = product(*child_solutions)
+	found = False
+	while found == False:
+		child_roots = prod.next()
+		child_sol = {}
+		for cc in range(num_children):
+			child_sol[child_vars[cc]] = child_roots[i][0]
+		sub_q_eq = curr_q_eq.subs(child_sol)
+		if abs(RR(sub_q_eq)) <= 1.0e-10:
+			found = True
+			for cc in range(num_children):
+				sol_dict[child_vars[cc]] = child_roots[i][0]
+			return sol_dict
+	return None
 
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 
