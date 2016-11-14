@@ -14,6 +14,7 @@ def elimVars(G,Q,B,P_values=None):
 #This method also adds an attribute res_eq to each node in the dirgraph that displays what polynomial it passed
 def altElim(dirgraph,node):
 	i = node.label
+	print "i = "+str(i)
 	if i==0:
 		elim_eqs = [altElim(dirgraph,child) for child in node.children]
 		return elim_eqs
@@ -25,13 +26,14 @@ def altElim(dirgraph,node):
 
 		for child in node.children:
 			j = child.label
+			print "j = " + str(j)
 			elim_eq = altElim(dirgraph,child)
 			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
 			g_eq = g_eq/(gcd(g_eq.coefficients()))
 			if i==1 and j==3:
 				print g_eq
 
-		g_eq = g_eq.resultant(r_eq,R[i])
+		g_eq = g_eq.resultant(r_eq,dirgraph.R[i])
 		g_eq = g_eq/(gcd(g_eq.coefficients()))
 		node.res_eq = g_eq
 		return g_eq
@@ -47,22 +49,17 @@ def convert_poly(f):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
 
-#Given a directed graph with some susceptances and P values, 
-#this returns a matrix beta whose i,j entry is the value of beta_{i,j}
-def beta_vals(dirgraph):
-	B = dirgraph.B
-	n = B.ncols()
-	beta = Matrix(RR,n,n)
-	for i in range(1,n):
-		curr_v = dirgraph.nodes[i]
-		parent_v = curr_v.parent
-		j = parent_v.label
-		P_sum = curr_v.p_value
-		for child in curr_v.children:
-			P_sum += child.p_value
-		beta[i,j] = P_sum/(-B[i,j])
-		beta[j,i] = -beta[i,j]
-	return beta
+def alt_solve(dirgraph,node):
+	final_eqs = altElim(dirgraph,node)
+
+	for f in final_eqs:
+		g = convert_poly(f)
+		g_roots = g.roots()
+		num_roots = len(g_roots)
+		solutions = []
+		for i in range(num_roots):
+			d = {}
+			d[f.variables()[0]] = g_roots[i]
 
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 
