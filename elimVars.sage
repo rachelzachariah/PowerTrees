@@ -82,6 +82,9 @@ def alt_solve(dirgraph,root):
 	return sol_amalg
 
 def update_sol(dirgraph,node,sol_dict):
+
+	if len(node.children)==0: return sol_dict
+
 	child_solutions = []
 	child_vars = []
 
