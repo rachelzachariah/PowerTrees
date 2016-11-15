@@ -46,12 +46,12 @@ def convert_poly(f):
 	return g
 
 def alt_solve(dirgraph,root):
-	final_eqs = altElim(dirgraph,node)
 
+	beta = dirgraph.beta
 	sol_amalg = []
 
 	for node in root.children:
-
+		p = node.label
 		branch_solutions = []
 		f = node.res_eq
 		g = convert_poly(f)
@@ -60,6 +60,7 @@ def alt_solve(dirgraph,root):
 		for i in range(num_roots):
 			sol_dict = {}
 			sol_dict[f.variables()[0]] = g_roots[i][0]
+			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[i,j]^2
 
 			to_visit = [node] #We perform a breadth-first search on the tree
 			for child in node.children:
@@ -69,25 +70,26 @@ def alt_solve(dirgraph,root):
 				node = to_visit[0]
 				to_visit.remove(node)
 
-				sol_dict = update_sol(node,sol_dict)
-				if sol_dict==None:
-					return "No solution"
+				sol_dict = update_sol(dirgraph,node,sol_dict)
+				#if sol_dict==None:
+				#	return "No solution"
 
 			branch_solutions.append(sol_dict)
 		sol_amalg.append(branch_solutions)
 	return sol_amalg
 
-def update_sol(node,sol_dict):
+def update_sol(dirgraph,node,sol_dict):
 	child_solutions = []
 	child_vars = []
+
+	p = node.label
 
 	for child in node.children:
 		f_child = child.res_eq
 		f_child_sub = f_child.subs(sol_dict)
-		g_child = convert_poly(f_child_subs)
+		g_child = convert_poly(f_child_sub)
 		child_roots = g_child.roots()
 		child_solutions.append(child_roots)
-		child_vars.append(g_child.variables()[0])
 
 	curr_q_eq = (node.q_eq).subs(sol_dict)
 	num_children = len(child_roots)
@@ -102,8 +104,11 @@ def update_sol(node,sol_dict):
 		if abs(RR(sub_q_eq)) <= 1.0e-10:
 			found = True
 			for cc in range(num_children):
-				sol_dict[child_vars[cc]] = child_roots[i][0]
-			return sol_dict
+				child = node.children[cc]
+				c = child.label
+				sol_dict[dirgraph.A[p,c]] = child_roots[i][0]
+				sol_dict[dirgraph.R[c]] = (child_roots[i][0]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
+			
 	return None
 
 
