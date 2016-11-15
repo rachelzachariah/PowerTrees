@@ -1,3 +1,5 @@
+from itertools import product
+
 #elimVars eliminates variables to give univariate equations for the tree-system
 #one univariate equation for each child of the root.
 
@@ -60,7 +62,8 @@ def alt_solve(dirgraph,root):
 		for i in range(num_roots):
 			sol_dict = {}
 			sol_dict[f.variables()[0]] = g_roots[i][0]
-			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[i,j]^2
+			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[root.label,node.label]^2
+			print sol_dict
 
 			to_visit = [node] #We perform a breadth-first search on the tree
 			for child in node.children:
@@ -89,25 +92,29 @@ def update_sol(dirgraph,node,sol_dict):
 		f_child_sub = f_child.subs(sol_dict)
 		g_child = convert_poly(f_child_sub)
 		child_roots = g_child.roots()
+		child_roots = [s[0] for s in child_roots]
 		child_solutions.append(child_roots)
 
 	curr_q_eq = (node.q_eq).subs(sol_dict)
-	num_children = len(child_roots)
+	num_children = len(node.children)
 	prod = product(*child_solutions)
 	found = False
 	while found == False:
 		child_roots = prod.next()
-		child_sol = {}
+		child_solutions_dict = {}
 		for cc in range(num_children):
-			child_sol[child_vars[cc]] = child_roots[i][0]
-		sub_q_eq = curr_q_eq.subs(child_sol)
+			c = node.children[cc].label
+			child_solutions_dict[dirgraph.A[p,c]] = child_roots[cc]
+		sub_q_eq = curr_q_eq.subs(child_solutions_dict)
 		if abs(RR(sub_q_eq)) <= 1.0e-10:
 			found = True
 			for cc in range(num_children):
 				child = node.children[cc]
 				c = child.label
-				sol_dict[dirgraph.A[p,c]] = child_roots[i][0]
-				sol_dict[dirgraph.R[c]] = (child_roots[i][0]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
+				sol_dict[dirgraph.A[p,c]] = child_roots[cc]
+				sol_dict[dirgraph.R[c]] = (child_roots[cc]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
+			print "p"+str(sol_dict)
+			return sol_dict
 			
 	return None
 
