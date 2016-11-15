@@ -69,16 +69,20 @@ def alt_solve(dirgraph,root):
 			for child in node.children:
 				to_visit.append(child)
 
+			real_solution = True
+
 			while len(to_visit) > 0:
-				node = to_visit[0]
-				print "Visiting node " + str(node.label)
-				to_visit.remove(node)
+				current_node = to_visit[0]
+				print "Visiting node " + str(current_node.label)
+				to_visit.remove(current_node)
 
-				sol_dict = update_sol(dirgraph,node,sol_dict)
-				#if sol_dict==None:
-				#	return "No solution"
+				sol_dict = update_sol(dirgraph,current_node,sol_dict)
+				if sol_dict==None:
+					real_solution = False
+					to_visit = []
 
-			branch_solutions.append(sol_dict)
+			if real_solution:
+				branch_solutions.append(sol_dict)
 			print ""
 		sol_amalg.append(branch_solutions)
 	return sol_amalg
@@ -92,6 +96,8 @@ def update_sol(dirgraph,node,sol_dict):
 
 	p = node.label
 
+	num_potential_solutions = 1
+
 	for child in node.children:
 		f_child = child.res_eq
 		f_child_sub = f_child.subs(sol_dict)
@@ -99,19 +105,24 @@ def update_sol(dirgraph,node,sol_dict):
 		child_roots = g_child.roots()
 		child_roots = [s[0] for s in child_roots]
 		child_solutions.append(child_roots)
+		num_potential_solutions = num_potential_solutions*len(child_roots)
 
 	curr_q_eq = (node.q_eq).subs(sol_dict)
 	num_children = len(node.children)
 	prod = product(*child_solutions)
 	found = False
-	while found == False:
+
+	num_solutions_checked = 0
+
+	while found == False and num_solutions_checked < num_potential_solutions:
 		child_roots = prod.next()
 		child_solutions_dict = {}
 		for cc in range(num_children):
 			c = node.children[cc].label
 			child_solutions_dict[dirgraph.A[p,c]] = child_roots[cc]
 		sub_q_eq = curr_q_eq.subs(child_solutions_dict)
-		if abs(RR(sub_q_eq)) <= 1.0e-10:
+
+		if abs(RR(sub_q_eq)) <= 1.0e-6:
 			found = True
 			for cc in range(num_children):
 				child = node.children[cc]
