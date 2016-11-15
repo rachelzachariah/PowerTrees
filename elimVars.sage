@@ -113,7 +113,7 @@ def update_sol(dirgraph,node,sol_dict):
 				c = child.label
 				sol_dict[dirgraph.A[p,c]] = child_roots[cc]
 				sol_dict[dirgraph.R[c]] = (child_roots[cc]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
-			print "p"+str(sol_dict)
+			print str(p)+' '+str(sol_dict)
 			return sol_dict
 			
 	return None
