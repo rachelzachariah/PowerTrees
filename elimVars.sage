@@ -113,11 +113,11 @@ def update_sol(dirgraph,node,sol_dict,tol):
 	found = False
 
 	num_solutions_checked = 0
-	print "num_potential_solutions =" + str(num_potential_solutions)
+	#print "num_potential_solutions =" + str(num_potential_solutions)
 
 	while found == False and num_solutions_checked < num_potential_solutions:
 		num_solutions_checked += 1
-		print "num sol checked = " + str(num_solutions_checked)
+		#print "num sol checked = " + str(num_solutions_checked)
 		child_roots = prod.next()
 		child_solutions_dict = {}
 		for cc in range(num_children):
@@ -125,7 +125,7 @@ def update_sol(dirgraph,node,sol_dict,tol):
 			child_solutions_dict[dirgraph.A[p,c]] = child_roots[cc]
 		sub_q_eq = curr_q_eq.subs(child_solutions_dict)
 
-		print abs(RR(sub_q_eq))
+		#print abs(RR(sub_q_eq))
 
 		if abs(RR(sub_q_eq)) <= tol:
 			found = True
