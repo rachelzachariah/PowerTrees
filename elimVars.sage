@@ -60,10 +60,10 @@ def alt_solve(dirgraph,root):
 		g_roots = g.roots()
 		num_roots = len(g_roots)
 		for i in range(num_roots):
+			print "Finding solution " + str(i)
 			sol_dict = {}
 			sol_dict[f.variables()[0]] = g_roots[i][0]
 			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[root.label,node.label]^2
-			print sol_dict
 
 			to_visit = [node] #We perform a breadth-first search on the tree
 			for child in node.children:
@@ -71,6 +71,7 @@ def alt_solve(dirgraph,root):
 
 			while len(to_visit) > 0:
 				node = to_visit[0]
+				print "Visiting node " + str(node.label)
 				to_visit.remove(node)
 
 				sol_dict = update_sol(dirgraph,node,sol_dict)
@@ -78,6 +79,7 @@ def alt_solve(dirgraph,root):
 				#	return "No solution"
 
 			branch_solutions.append(sol_dict)
+			print ""
 		sol_amalg.append(branch_solutions)
 	return sol_amalg
 
@@ -116,7 +118,6 @@ def update_sol(dirgraph,node,sol_dict):
 				c = child.label
 				sol_dict[dirgraph.A[p,c]] = child_roots[cc]
 				sol_dict[dirgraph.R[c]] = (child_roots[cc]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
-			print str(p)+' '+str(sol_dict)
 			return sol_dict
 			
 	return None
