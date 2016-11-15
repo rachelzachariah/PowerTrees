@@ -47,7 +47,7 @@ def convert_poly(f):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
 
-def alt_solve(dirgraph,root):
+def alt_solve(dirgraph,root,tol=1.0e-6):
 
 	beta = dirgraph.beta
 	sol_amalg = []
@@ -76,7 +76,7 @@ def alt_solve(dirgraph,root):
 				print "Visiting node " + str(current_node.label)
 				to_visit.remove(current_node)
 
-				sol_dict = update_sol(dirgraph,current_node,sol_dict)
+				sol_dict = update_sol(dirgraph,current_node,sol_dict,tol=tol)
 				if sol_dict==None:
 					real_solution = False
 					to_visit = []
@@ -87,7 +87,7 @@ def alt_solve(dirgraph,root):
 		sol_amalg.append(branch_solutions)
 	return sol_amalg
 
-def update_sol(dirgraph,node,sol_dict):
+def update_sol(dirgraph,node,sol_dict,tol):
 
 	if len(node.children)==0: return sol_dict
 
@@ -113,8 +113,11 @@ def update_sol(dirgraph,node,sol_dict):
 	found = False
 
 	num_solutions_checked = 0
+	print "num_potential_solutions =" + str(num_potential_solutions)
 
 	while found == False and num_solutions_checked < num_potential_solutions:
+		num_solutions_checked += 1
+		print "num sol checked = " + str(num_solutions_checked)
 		child_roots = prod.next()
 		child_solutions_dict = {}
 		for cc in range(num_children):
@@ -122,7 +125,9 @@ def update_sol(dirgraph,node,sol_dict):
 			child_solutions_dict[dirgraph.A[p,c]] = child_roots[cc]
 		sub_q_eq = curr_q_eq.subs(child_solutions_dict)
 
-		if abs(RR(sub_q_eq)) <= 1.0e-6:
+		print abs(RR(sub_q_eq))
+
+		if abs(RR(sub_q_eq)) <= tol:
 			found = True
 			for cc in range(num_children):
 				child = node.children[cc]
