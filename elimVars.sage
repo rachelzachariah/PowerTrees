@@ -48,6 +48,24 @@ def convert_poly(f):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
 
+def convert_poly_precision(f,precision):
+	var = f.variables()[0]
+	degr = f.degree()
+	R.<x> = PolynomialRing(RealField(precision))
+	g = f.constant_coefficient()
+	for i in range(1,degr+1):
+		g = g + R(f.coefficient(var^i))*x^i
+	return g
+
+def convert_complex_poly(f):
+	var = f.variables()[0]
+	degr = f.degree()
+	R.<x> = PolynomialRing(CC)
+	g = f.constant_coefficient()
+	for i in range(1,degr+1):
+		g = g + CC(f.coefficient(var^i))*x^i
+	return g
+
 def alt_solve(dirgraph,root,tol=1.0e-6):
 
 	beta = dirgraph.beta
@@ -60,6 +78,7 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 		g = convert_poly(f)
 		g_roots = g.roots()
 		num_roots = len(g_roots)
+		print "Node "+str(p)+" branch : "+str(num_roots)+" potential solutions"
 		for i in range(num_roots):
 			print "Checking solution " + str(i)
 			sol_dict = {}
@@ -84,7 +103,7 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 
 			if real_solution:
 				branch_solutions.append(sol_dict)
-			print ""
+
 		sol_amalg.append(branch_solutions)
 
 	n_branches = len(root.children)
