@@ -190,22 +190,22 @@ def convert_abr_xy(dirgraph,ar_solutions):
 				for child in current_node.children:
 					to_visit.append(child)
 				c = current_node.label
-				p = current.node.parent.label
+				p = current_node.parent.label
 
 				eq_matrix = Matrix(RR,2,2)
-				eq_matrix[0,0] = sol_dict['x'+str(p)]
-				eq_matrix[0,1] = sol_dict['y'+str(p)]
-				eq_matrix[1,0] = -sol_dict['y'+str(p)]
-				eq_matrix[1,1] = sol_dict['x'+str(p)]
+				eq_matrix[0,0] = xy_sol_dict['x'+str(p)]
+				eq_matrix[0,1] = xy_sol_dict['y'+str(p)]
+				eq_matrix[1,0] = -xy_sol_dict['y'+str(p)]
+				eq_matrix[1,1] = xy_sol_dict['x'+str(p)]
 
-				if det(eq_mx) == 0:
+				if det(eq_matrix) == 0:
 					xy_sol_dict['x'+str(c)] = 0
 					xy_sol_dict['y'+str(c)] = 0
 				else:
 					a_b_vals = Matrix(RR,2,1)
-					a_b_vals[0,0] = sol_dict[A[c,p]]
+					a_b_vals[0,0] = ar_sol_dict[A[c,p]]
 					a_b_vals[1,0] = beta[c,p]
-					current_xy = eq_mx.inverse()*a_b_vals
+					current_xy = eq_matrix.inverse()*a_b_vals
 					xy_sol_dict['x'+str(c)] = current_xy[0,0]
 					xy_sol_dict['y'+str(c)] = current_xy[1,0]
 			xy_branch_solutions.append(xy_sol_dict)
