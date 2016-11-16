@@ -86,17 +86,19 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[root.label,node.label]^2
 
 			to_visit = [node] #We perform a breadth-first search on the tree
-			for child in node.children:
-				to_visit.append(child)
-
 			real_solution = True
 
 			while len(to_visit) > 0:
 				current_node = to_visit[0]
-				#print "Visiting node " + str(current_node.label)
 				to_visit.remove(current_node)
+				for child in current_node.children:
+					to_visit.append(child)
+				#print "Visiting node " + str(current_node.label)
 
 				sol_dict = update_sol(dirgraph,current_node,sol_dict,tol=tol)
+
+
+
 				if sol_dict==None:
 					real_solution = False
 					to_visit = []
@@ -163,6 +165,52 @@ def update_sol(dirgraph,node,sol_dict,tol):
 			return sol_dict
 			
 	return None
+
+def convert_abr_xy(dirgraph,ar_solutions):
+	beta = dirgraph.beta
+	A = dirgraph.A
+	R = dirgraph.R
+
+	xy_solutions = []
+	root = dirgraph.nodes[0]
+	n_branches = len(root.children)
+	for b in range(n_branches):
+		branch_top = root.children[b]
+		xy_branch_solutions = []
+		for l in range(len(ar_solutions[b])):
+			ar_sol_dict = ar_solutions[b][l]
+			xy_sol_dict = {}
+			xy_sol_dict['x0'] = 1
+			xy_sol_dict['y0'] = 0
+			to_visit = [branch_top]
+
+			while len(to_visit) > 0:
+				current_node = to_visit[0]
+				to_visit.remove(current_node)
+				for child in current_node.children:
+					to_visit.append(child)
+				c = current_node.label
+				p = current.node.parent.label
+
+				eq_matrix = Matrix(RR,2,2)
+				eq_matrix[0,0] = sol_dict['x'+str(p)]
+				eq_matrix[0,1] = sol_dict['y'+str(p)]
+				eq_matrix[1,0] = -sol_dict['y'+str(p)]
+				eq_matrix[1,1] = sol_dict['x'+str(p)]
+
+				if det(eq_mx) == 0:
+					xy_sol_dict['x'+str(c)] = 0
+					xy_sol_dict['y'+str(c)] = 0
+				else:
+					a_b_vals = Matrix(RR,2,1)
+					a_b_vals[0,0] = sol_dict[A[c,p]]
+					a_b_vals[1,0] = beta[c,p]
+					current_xy = eq_mx.inverse()*a_b_vals
+					xy_sol_dict['x'+str(c)] = current_xy[0,0]
+					xy_sol_dict['y'+str(c)] = current_xy[1,0]
+			xy_branch_solutions.append(xy_sol_dict)
+		xy_solutions.append(xy_branch_solutions)
+	return xy_solutions
 
 
 #elimVarsinternal is recursively called to eliminate the nodes R variable and 
