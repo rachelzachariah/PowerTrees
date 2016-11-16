@@ -15,6 +15,7 @@ def elimVars(G,Q,B,P_values=None):
 #If the node passed is the root, is returns a list of the resulting equation for each child of the root
 #This method also adds an attribute res_eq to each node in the dirgraph that displays what polynomial it passed
 def altElim(dirgraph,node):
+	S = dirgraph.S
 	i = node.label
 	if i==0:
 		elim_eqs = [altElim(dirgraph,child) for child in node.children]
@@ -28,11 +29,11 @@ def altElim(dirgraph,node):
 		for child in node.children:
 			j = child.label
 			elim_eq = altElim(dirgraph,child)
-			g_eq = g_eq.resultant(elim_eq,dirgraph.A[i,j])
-			g_eq = g_eq/(gcd(g_eq.coefficients()))
+			g_eq = S(g_eq.resultant(elim_eq,dirgraph.A[i,j]))
+			g_eq = S(g_eq/(gcd(g_eq.coefficients())))
 
-		g_eq = g_eq.resultant(r_eq,dirgraph.R[i])
-		g_eq = g_eq/(gcd(g_eq.coefficients()))
+		g_eq = S(g_eq.resultant(r_eq,dirgraph.R[i]))
+		g_eq = S(g_eq/(gcd(g_eq.coefficients())))
 		node.res_eq = g_eq
 		return g_eq
 
@@ -60,7 +61,7 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 		g_roots = g.roots()
 		num_roots = len(g_roots)
 		for i in range(num_roots):
-			print "Finding solution " + str(i)
+			print "Checking solution " + str(i)
 			sol_dict = {}
 			sol_dict[f.variables()[0]] = g_roots[i][0]
 			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[root.label,node.label]^2
@@ -73,7 +74,7 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 
 			while len(to_visit) > 0:
 				current_node = to_visit[0]
-				print "Visiting node " + str(current_node.label)
+				#print "Visiting node " + str(current_node.label)
 				to_visit.remove(current_node)
 
 				sol_dict = update_sol(dirgraph,current_node,sol_dict,tol=tol)
@@ -85,6 +86,12 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 				branch_solutions.append(sol_dict)
 			print ""
 		sol_amalg.append(branch_solutions)
+
+	n_branches = len(root.children)
+	for l in range(n_branches):
+		c = root.children[l].label
+		print "Node "+str(c)+" branch : "+str(len(sol_amalg[0]))+" solutions found"
+
 	return sol_amalg
 
 def update_sol(dirgraph,node,sol_dict,tol):
@@ -158,7 +165,7 @@ def elimVarsinternal(node,dirgraph):
 		 	degree = node.q_eq.degree(R[i])
 		 	temp = S(node.q_eq)
 		 	elim = S((R[j1]^degree)*temp.subs({R[i]:(A[i,j1]^2)/R[j1]}))
-		 	
+		 	node.res_eq = elim
 		else:
 			#eliminate the alpha_ij's first
 			g=S(node.q_eq)
@@ -178,6 +185,7 @@ def elimVarsinternal(node,dirgraph):
 	        #,R[j1]*g.subs({R[i]:(A[i,j1]^2)/R[j1]})
 			degree = g.degree(R[i])
 			elim = S((R[j1]^degree)*g.subs({R[i]:(A[i,j1]^2)/R[j1]}))
+			node.res_eq = elim
 		if node.parent.label == 0 :
 			elimq = elim
 			elimr = U(elim)
