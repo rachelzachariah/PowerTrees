@@ -10,4 +10,5 @@ Q = [0,1,2,3,4,5,6]
 P = [0,0,0,0,0,0,0]
 P_values = P
 dirgraph = power_eqs_ar(G,Q,B,P=P_values)
-final_eqs = altElim(dirgraph,dirgraph.nodes[0])
+final_eqs = elimVars(dirgraph,dirgraph.nodes[0])
+solutions = alt_solve(dirgraph,dirgraph.nodes[0])
