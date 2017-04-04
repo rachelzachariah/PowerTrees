@@ -13,7 +13,7 @@ parser.add_argument('-N', type=int, dest="N", default = 6)
 args = vars(parser.parse_args())
 reps = args["reps"]
 nmin = args["n"]
-nmax = args["nmax"]
+nmax = args["N"]
 
 
 load('power_eqs_ar.sage')
