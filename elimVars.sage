@@ -40,7 +40,6 @@ def altElim(dirgraph,node):
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
 #It then finds the roots of said polynomial and returns them
 def convert_poly(f):
-	print str(f)
 	var = f.variables()[0]
 	degr = f.degree()
 	R.<x> = PolynomialRing(RR)
