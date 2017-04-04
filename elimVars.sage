@@ -40,6 +40,7 @@ def altElim(dirgraph,node):
 #Converts a polynomial in a real multivariate ring to a real univariate polynomial
 #It then finds the roots of said polynomial and returns them
 def convert_poly(f):
+	print str(f)
 	var = f.variables()[0]
 	degr = f.degree()
 	R.<x> = PolynomialRing(RR)
@@ -48,6 +49,10 @@ def convert_poly(f):
 		g = g + RR(f.coefficient(var^i))*x^i
 	return g
 
+
+#Converts a univariate polynomial in a real multivariate ring to a real univariate polynomial
+#It then finds the roots of said polynomial and returns them.
+#Here there is the added ability to specify the precision of the real field you want.
 def convert_poly_precision(f,precision):
 	var = f.variables()[0]
 	degr = f.degree()
@@ -57,6 +62,7 @@ def convert_poly_precision(f,precision):
 		g = g + R(f.coefficient(var^i))*x^i
 	return g
 
+#Converts a real polynomial to a complex polynomial.
 def convert_complex_poly(f):
 	var = f.variables()[0]
 	degr = f.degree()
@@ -66,21 +72,33 @@ def convert_complex_poly(f):
 		g = g + CC(f.coefficient(var^i))*x^i
 	return g
 
+#Given a directed graph with the root node specified, this solves the power flow equations
 def alt_solve(dirgraph,root,tol=1.0e-6):
 
 	beta = dirgraph.beta
+
+	#Sol amalg will have n arrays in it
+	#It will have one array for each child of the root node
+	#The ith element in sol_amalg will contain dictionaries of all the real solutions
+	#to that part of the graph
 	sol_amalg = []
 
 	for node in root.children:
 		p = node.label
 		branch_solutions = []
-		f = node.res_eq
-		g = convert_poly(f)
-		g_roots = g.roots()
+		f = node.res_eq #This is a univariate polynomial in a multivariate ring
+		g = convert_poly(f) #We convert it to a polynomial in a real univariate ring
+		g_roots = g.roots() #These are all its real roots
 		num_roots = len(g_roots)
 		print "Node "+str(p)+" branch : "+str(num_roots)+" potential solutions"
+
+		#We now go through all the real roots and see which will result in real solutions
+		#to the entire system
 		for i in range(num_roots):
 			print "Checking solution " + str(i)
+
+			#We create a dictionary and add the alpha and R values for the node
+			#just adjacent to the root node
 			sol_dict = {}
 			sol_dict[f.variables()[0]] = g_roots[i][0]
 			sol_dict[dirgraph.R[p]] = g_roots[i][0]^2+beta[root.label,node.label]^2
@@ -95,28 +113,33 @@ def alt_solve(dirgraph,root,tol=1.0e-6):
 					to_visit.append(child)
 				#print "Visiting node " + str(current_node.label)
 
+				#We update the solution dictionary to contain the corresponding solutions
+				#to the variables below the node
+				#If any solution is not real, this returns None
 				sol_dict = update_sol(dirgraph,current_node,sol_dict,tol=tol)
 
-
-
+				#Here we check if we returned none
 				if sol_dict==None:
 					real_solution = False
 					to_visit = []
 
+			#If we don't return none, then we have a set of real solutions to the system
 			if real_solution:
 				branch_solutions.append(sol_dict)
-
 		sol_amalg.append(branch_solutions)
 
 	n_branches = len(root.children)
 	for l in range(n_branches):
 		c = root.children[l].label
-		print "Node "+str(c)+" branch : "+str(len(sol_amalg[0]))+" solutions found"
+		print "Node "+str(c)+" branch : "+str(len(sol_amalg[l]))+" solutions found"
 
 	return sol_amalg
 
+#Given a directed graph and a node, with some values in sol_dict, finds 
+#the corresponding solutions to the children of the node
 def update_sol(dirgraph,node,sol_dict,tol):
 
+	#If the node has no children then we're done
 	if len(node.children)==0: return sol_dict
 
 	child_solutions = []
@@ -127,21 +150,21 @@ def update_sol(dirgraph,node,sol_dict,tol):
 	num_potential_solutions = 1
 
 	for child in node.children:
-		f_child = child.res_eq
-		f_child_sub = f_child.subs(sol_dict)
-		g_child = convert_poly(f_child_sub)
-		child_roots = g_child.roots()
+		f_child = child.res_eq #This is the polynomial governing the child
+		f_child_sub = f_child.subs(sol_dict) #We sub in the values of the variables above it
+		g_child = convert_poly(f_child_sub) #We convert it to a real univariate polynomial
+		child_roots = g_child.roots() #We find its roots
 		child_roots = [s[0] for s in child_roots]
 		child_solutions.append(child_roots)
 		num_potential_solutions = num_potential_solutions*len(child_roots)
 
+	#We check if the solutions to each of the children satisfy the necessary equation
 	curr_q_eq = (node.q_eq).subs(sol_dict)
 	num_children = len(node.children)
-	prod = product(*child_solutions)
+	prod = product(*child_solutions) #This contains the solutions to the children
 	found = False
 
 	num_solutions_checked = 0
-	#print "num_potential_solutions =" + str(num_potential_solutions)
 
 	while found == False and num_solutions_checked < num_potential_solutions:
 		num_solutions_checked += 1
@@ -151,10 +174,9 @@ def update_sol(dirgraph,node,sol_dict,tol):
 		for cc in range(num_children):
 			c = node.children[cc].label
 			child_solutions_dict[dirgraph.A[p,c]] = child_roots[cc]
-		sub_q_eq = curr_q_eq.subs(child_solutions_dict)
+		sub_q_eq = curr_q_eq.subs(child_solutions_dict) #We sub in the current children solutions
 
-		#print abs(RR(sub_q_eq))
-
+		#We have approximate values, so we heck if they satisfy the equation up to some tolerance
 		if abs(RR(sub_q_eq)) <= tol:
 			found = True
 			for cc in range(num_children):
@@ -163,9 +185,11 @@ def update_sol(dirgraph,node,sol_dict,tol):
 				sol_dict[dirgraph.A[p,c]] = child_roots[cc]
 				sol_dict[dirgraph.R[c]] = (child_roots[cc]^2+dirgraph.beta[p,c]^2)/sol_dict[dirgraph.R[p]]
 			return sol_dict
-			
+		
+	#If none of the solutions work, return None		
 	return None
 
+#Converts solutions to abr in to solutions for xy
 def convert_abr_xy(dirgraph,ar_solutions):
 	beta = dirgraph.beta
 	A = dirgraph.A
