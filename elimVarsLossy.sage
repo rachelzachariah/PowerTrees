@@ -6,7 +6,7 @@
 #Q_values - reactive power
 
 def elimVars(Graph,G,B,Q_values=None,P_values=None):
-	dirgraph = power_eqs_abr(Graph,G,Q,B,Q_values,P_values) #initalize req structures
+	dirgraph = power_eqs_abr(Graph,G,B,Q_values,P_values) #initalize req structures
 	root=dirgraph.nodes[0]
 	elim=elimVarsinternal(root,dirgraph)
 	return elim
@@ -87,14 +87,19 @@ def elimVarsinternal(node,dirgraph):
 		if not children:  #leaf node
 			#eliminate the nodes local R variable from the Q-eqn
 			#, R[j1]*node.q_eq.subs({R[i]:(A[i,j1]^2)/R[j1]})
+			elim = []
 		 	degree = node.q_eq.degree(R[i])
 		 	temp = S(node.q_eq)
-		 	elim = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
-		 	
+		 	elim1 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
+		 	elim.append(elim1)
+		 	degree = node.p_eq.degree(R[i])
+		 	temp = S(node.p_eq)
+		 	elim2 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
+		 	elim.append(elim2)		 	
 		else:
 			#eliminate the alpha/beta_ij's first
-			g1=S(node.q_eq)
-			g2=S(node.p_eq)
+			g1temp=S(node.q_eq)
+			g2temp=S(node.p_eq)
 			counter=0
 			for child in node.children:
 				j2 = child.label
@@ -103,13 +108,16 @@ def elimVarsinternal(node,dirgraph):
 				if counter==0: #the first alpha_ij can just be eliminated by subs
 					Gc = G[i,j2]
 					Bc = B[i,j2]
-					g1 = S((Gc*g2-Bc*g1)/(Gc^2+Bc^2))
-					g2 = S((Bc*g2+Gc*g1)/(Gc^2+Bc^2))
+					g1 = S((Gc*g2temp-Bc*g1temp)/(Gc^2+Bc^2))
+					g2 = S((Bc*g2temp+Gc*g1temp)/(Gc^2+Bc^2))
 					degree1 = p.degree(a[i,j2])
-					degree2 = q.degree(b[i,j2])
+					if i<=j2: #not sure how to get around the skew-symmetry here
+						degree2 = q.degree(b[i,j2])
+					else:
+						degree2 = q.degree(b[j2,i])
 					#print 'eliminating',A[i,j2],S((B[i,j2]^degree)*p.subs({A[i,j2]: S((g/S(B[i,j2]))+A[i,j2])}))
-					pnew = S(((Gc^2+Bc^2)^degree1)*p.subs({a[i,j2]: g1-a[i,j2], b[i,j2]: g2-b[i,j2]}))
-					qnew = S(((Gc^2+Bc^2)^degree2)*q.subs({a[i,j2]: g1-a[i,j2], b[i,j2]: g2-b[i,j2]}))
+					pnew = S(((Gc^2+Bc^2)^degree1)*p.subs({a[i,j2]: g1+a[i,j2], b[i,j2]: g2-b[i,j2]}))
+					qnew = S(((Gc^2+Bc^2)^degree2)*q.subs({a[i,j2]: g1+a[i,j2], b[i,j2]: g2-b[i,j2]}))
 					counter = 1
 				else:#remaining alpha_ij needs resultants for elimination
 					p1 = S(pnew.resultant(qnew,b[i,j2])) #whats the right choices here???
@@ -122,10 +130,14 @@ def elimVarsinternal(node,dirgraph):
 	        #,R[j1]*g.subs({R[i]:(A[i,j1]^2)/R[j1]})
 			degreep = pnew.degree(R[i])
 			degreeq = qnew.degree(R[i])
-			pnew = S((R[j1]^degreep)*pnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
-			qnew = S((R[j1]^degreeq)*qnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
+			elim = []
+			elim1 = S((R[j1]^degreep)*pnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
+			elim2 = S((R[j1]^degreeq)*qnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
+			elim.append(elim1)
+			elim.append(elim2)
+
 		if node.parent.label == 0 :
-			elimq = pnew.resultant(qnew,b[i,j2])
+			elimq = elim1.resultant(elim2,b[i,0])
 			elimr = U(elimq)
 			elim = []
 			elim.append(elimq)

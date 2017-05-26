@@ -1,16 +1,16 @@
-load('power_eqs_ar.sage')
+load('power_eqs_abr.sage')
 load('DirGraph.sage')
-load('elimVars.sage')
-G = Graph()
-G.add_edges([(0,1),(1,2),(1,3),(1,4),(2,5),(3,6)])
-A = G.adjacency_matrix()
-adj_mx = G.adjacency_matrix()
-B = Matrix(7,7)
-for i in range(7):
-    for j in range(i+1,7):
+load('elimVarsLossy.sage')
+graph = Graph()
+graph.add_edges([(0,1),(1,2),(1,3)])
+A = graph.adjacency_matrix()
+B = Matrix(4,4)
+G = Matrix(4,4)
+for i in range(4):
+    for j in range(i+1,4):
     	if A[i,j] != 0:
-        	B[i,j] = B[j,i] = randint(-10,-1)  
-Q = [0,1,2,3,4,5,6]
+           	B[i,j] = B[j,i] = randint(-10,-1)  
+        	G[i,j] = G[j,i] = randint(-10,-1) 
+Q = [0,0,0,0,1,2,3,4,5,6]
 P = [0,0,0,0,0,0,0]
-P_values = P
-dirgraph = power_eqs_ar(G,Q,B,P=P_values)
+dirgraph = power_eqs_abr(graph,G,B,Q,P)
