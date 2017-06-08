@@ -173,7 +173,7 @@ def populate_node(node, dirgraph, adjacency_matrix, P=None):
 def beta_vals(dirgraph):
 	B = dirgraph.B
 	n = B.ncols()
-	beta = Matrix(RR,n,n)
+	beta = Matrix(QQ,n,n)
 	for i in range(1,n):
 		curr_v = dirgraph.nodes[i]
 		parent_v = curr_v.parent
