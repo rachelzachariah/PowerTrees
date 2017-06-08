@@ -1,7 +1,7 @@
 import argparse
 
-def solve_eqs(G,Q,B,P):
-	dirgraph = elimVars(G,Q,B,P)
+def solve_eqs(dirgraph):
+	elim_eqs = elimVars(dirgraph,dirgraph.nodes[0])
 	solutions = alt_solve(dirgraph,dirgraph.nodes[0],tol=1.0e-3)
 	return solutions
 
@@ -38,6 +38,6 @@ for n in range(nmin,nmax+1):
 			P_values.append(randint(1,10))
 			Q.append(randint(1,10))
 		dirgraph = power_eqs_ar(G,Q,B,P=P_values)
-		curr_time += timeit('solve_eqs(G,Q,B,P_values)',seconds=True,repeat=1)
+		curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 	curr_time = curr_time/reps
 	print "Average time for "+str(n)+" nodes : "+str(curr_time)
