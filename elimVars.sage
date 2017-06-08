@@ -270,13 +270,16 @@ def elimVarsinternal(node,dirgraph):
 	        #,R[j1]*g.subs({R[i]:(A[i,j1]^2)/R[j1]})
 			degree = g.degree(R[i])
 			elim = S((R[j1]^degree)*g.subs({R[i]:(A[i,j1]^2)/R[j1]}))
+
 		if node.parent.label == 0 :
 			elimq = elim
 			elimr = U(elim)
 			elim = []
 			elim.append(elimq)
 			elim.append(elimr)	
-		node.res_eq = elim
+			node.res_eq = elimq
+		else:
+			node.res_eq = elim
 	else: #root node
 		elim = []
 		elimQ = [] #list to hold univariate eqns from all root's children
