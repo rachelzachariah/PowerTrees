@@ -1,7 +1,7 @@
 import argparse
 
 def solve_eqs(dirgraph):
-	dirgraph, elim_eqs = elimVars(dirgraph,dirgraph.nodes[0])
+	elim_eqs = elimVars(dirgraph,dirgraph.nodes[0])
 	solutions = alt_solve(dirgraph,dirgraph.nodes[0],tol=1.0e-3)
 	return solutions
 
@@ -14,7 +14,6 @@ args = vars(parser.parse_args())
 reps = args["reps"]
 nmin = args["n"]
 nmax = args["N"]
-
 
 load('power_eqs_ar.sage')
 load('DirGraph.sage')
