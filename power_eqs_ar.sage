@@ -58,6 +58,7 @@ def power_eqs_ar(G,Q,B,P=None):
 
 
 	beta = beta_vals(dirgraph) #This solves for the beta_{i,j} values
+	dirgraph.beta = beta
 
 	q_eqs = [] #These will be the Q equations
 	r_eqs = [] #These equations give the relations a_{i,j}^2 = R_iR_j
