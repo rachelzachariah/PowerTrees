@@ -1,7 +1,7 @@
 import argparse
 
 def solve_eqs(dirgraph):
-	elim_eqs = elimVars(dirgraph,dirgraph.nodes[0])
+	dirgraph, elim_eqs = elimVars(dirgraph,dirgraph.nodes[0])
 	solutions = alt_solve(dirgraph,dirgraph.nodes[0],tol=1.0e-3)
 	return solutions
 
