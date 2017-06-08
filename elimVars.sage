@@ -1,9 +1,7 @@
 #elimVars eliminates variables to give univariate equations for the tree-system
 #one univariate equation for each child of the root.
 
-def elimVars(G,Q,B,P_values=None):
-	dirgraph = power_eqs_ar(G,Q,B,P=P_values) #initalize req structures
-	root=dirgraph.nodes[0]
+def elimVars(dirgraph,root):
 	elim=elimVarsinternal(root,dirgraph)
 	return elim
 
