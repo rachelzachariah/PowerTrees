@@ -3,7 +3,7 @@
 
 def elimVars(dirgraph,root):
 	elim=elimVarsinternal(root,dirgraph)
-	return root, elim
+	return elim
 
 #Given a directed graph and a node i, this recursively calls to get the variable reduced
 #equations from all the node's children. It then uses resultants to eliminate the variables a_{i,j}
@@ -276,6 +276,7 @@ def elimVarsinternal(node,dirgraph):
 			elim = []
 			elim.append(elimq)
 			elim.append(elimr)	
+		node.res_eq = elim
 	else: #root node
 		elim = []
 		elimQ = [] #list to hold univariate eqns from all root's children
