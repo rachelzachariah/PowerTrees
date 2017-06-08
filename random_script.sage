@@ -15,7 +15,6 @@ reps = args["reps"]
 nmin = args["n"]
 nmax = args["N"]
 
-
 load('power_eqs_ar.sage')
 load('DirGraph.sage')
 load('elimVars.sage')
