@@ -1,3 +1,4 @@
+from itertools import product
 #elimVars eliminates variables to give univariate equations for the tree-system
 #one univariate equation for each child of the root.
 
