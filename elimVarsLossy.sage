@@ -5,11 +5,13 @@
 #P_values - active power
 #Q_values - reactive power
 
-def elimVars(Graph,G,B,Q_values=None,P_values=None):
-	dirgraph = power_eqs_abr(Graph,G,B,Q_values,P_values) #initalize req structures
+#dirgraph = power_eqs_abr(Graph,G,B,Q_values,P_values) #initalize req structures
+
+def elimVars(dirgraph):	
 	root=dirgraph.nodes[0]
 	elim=elimVarsinternal(root,dirgraph)
-	return elim
+	dirgraph.elim = elim
+	return dirgraph
 
 #Given a directed graph and a node i, this recursively calls to get the variable reduced
 #equations from all the node's children. It then uses resultants to eliminate the variables a_{i,j}
