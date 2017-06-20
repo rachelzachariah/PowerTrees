@@ -94,10 +94,12 @@ def elimVarsinternal(node,dirgraph):
 		 	temp = S(node.q_eq)
 		 	elim1 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
 		 	elim.append(elim1)
+		 	node.elim1 = elim1
 		 	degree = node.p_eq.degree(R[i])
 		 	temp = S(node.p_eq)
 		 	elim2 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
-		 	elim.append(elim2)		 	
+		 	elim.append(elim2)	
+		 	node.elim2 = elim2	 	
 		else:
 			#eliminate the alpha/beta_ij's first
 			g1temp=S(node.q_eq)
