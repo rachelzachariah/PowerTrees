@@ -120,6 +120,8 @@ def elimVarsinternal(node,dirgraph):
 					#print 'eliminating',A[i,j2],S((B[i,j2]^degree)*p.subs({A[i,j2]: S((g/S(B[i,j2]))+A[i,j2])}))
 					pnew = S(((Gc^2+Bc^2)^degree1)*p.subs({a[i,j2]: g1+a[i,j2], b[i,j2]: g2-b[i,j2]}))
 					qnew = S(((Gc^2+Bc^2)^degree2)*q.subs({a[i,j2]: g1+a[i,j2], b[i,j2]: g2-b[i,j2]}))
+					node.barelim1 = pnew
+					node.barelim2 = qnew
 					counter = 1
 				else:#remaining alpha_ij needs resultants for elimination
 					p1 = S(pnew.resultant(qnew,b[i,j2])) #whats the right choices here???
@@ -127,6 +129,8 @@ def elimVarsinternal(node,dirgraph):
 					p3 = S(p.resultant(q,b[i,j2]))
 					pnew = S(p1.resultant(p2,a[i,j2]))	
 					qnew = S(p2.resultant(p3,a[i,j2]))
+					node.barelim1 = pnew
+					node.barelim2 = qnew
 
 			#eliminate the node's local R variable next
 	        #,R[j1]*g.subs({R[i]:(A[i,j1]^2)/R[j1]})
@@ -135,6 +139,8 @@ def elimVarsinternal(node,dirgraph):
 			elim = []
 			elim1 = S((R[j1]^degreep)*pnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
 			elim2 = S((R[j1]^degreeq)*qnew.subs({R[i]:(a[i,j1]^2+b[i,j1]^2)/R[j1]}))
+			node.elim1 = elim1
+			node.elim2 = elim2
 			elim.append(elim1)
 			elim.append(elim2)
 
