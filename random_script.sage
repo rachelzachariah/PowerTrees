@@ -41,6 +41,13 @@ for t in range(reps):
 		G = graphs.RandomTree(n)
 		if max(G.degree()) <= max_deg:
 			found = True	
+
+	gd = G.degree()
+	max_gd = max(gd)
+	best_v = gd.index(max_gd)
+	if best_v != 0:
+		G.relabel({0:best_v, best_v:0})
+
 	A = G.adjacency_matrix()
 	B = Matrix(ZZ,n)
 	P_values = []
