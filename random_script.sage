@@ -53,7 +53,7 @@ for t in range(reps):
 		Q.append(randint(1,10))
 	dirgraph = power_eqs_ar(G,Q,B,P=P_values)
 	if filename != "":
-		write_equations(dirgraph.eqs,filename)
+		write_equations(dirgraph.eqs,filename+"t"+str(t))
 	curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 curr_time = curr_time/reps
 print "Average time for "+str(n)+" nodes : "+str(curr_time)
