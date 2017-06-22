@@ -37,7 +37,7 @@ times = []
 curr_time = 0
 for t in range(reps):
 	found = False
-	while found = False:
+	while found == False:
 		G = graphs.RandomTree(n)
 		if max(G.degree()) <= max_deg:
 			found = True	
