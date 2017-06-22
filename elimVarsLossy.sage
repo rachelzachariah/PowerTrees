@@ -89,17 +89,23 @@ def elimVarsinternal(node,dirgraph):
 		if not children:  #leaf node
 			#eliminate the nodes local R variable from the Q-eqn
 			#, R[j1]*node.q_eq.subs({R[i]:(A[i,j1]^2)/R[j1]})
-			elim = []
-		 	degree = node.q_eq.degree(R[i])
-		 	temp = S(node.q_eq)
-		 	elim1 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
-		 	elim.append(elim1)
-		 	node.elim1 = elim1
-		 	degree = node.p_eq.degree(R[i])
-		 	temp = S(node.p_eq)
-		 	elim2 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
-		 	elim.append(elim2)	
-		 	node.elim2 = elim2	 	
+		elim = []
+		degree = node.p_eq.degree(R[i])
+		temp = S(node.p_eq)
+		elim1 = S((R[j1]^degree)*temp.subs({R[i]:(a[i,j1]^2)/R[j1]}))
+		node.elim1 = elim1
+		elim2 = S((G[i,j1]*node.q_eq + B[i,j1]*temp)/(B[i,j1]^2+G[i,j1]^2)) # this solves for beta, possible at leaves
+		
+		#Update all relevant eqs with the beta val:
+		elim1 = elim1.subs({b[i,j1]:elim2+b[i,j1]})
+		node.p_eq = node.p_eq.subs({b[i,j1]:elim2+b[i,j1]})
+		node.q_eq = node.q_eq.subs({b[i,j1]:elim2+b[i,j1]})
+		node.parent.p_eq = node.parent.p_eq.subs({b[i,j1]:elim2+b[i,j1]})
+		node.parent.q_eq = node.parent.q_eq.subs({b[i,j1]:elim2+b[i,j1]})
+
+		elim.append(elim1)
+		elim.append(elim2)	
+		node.elim2 = elim2	 	
 		else:
 			#eliminate the alpha/beta_ij's first
 			g1temp=S(node.q_eq)
