@@ -97,11 +97,15 @@ def elimVarsinternal(node,dirgraph):
 			elim2 = S((G[i,j1]*node.q_eq + B[i,j1]*temp)/(B[i,j1]^2+G[i,j1]^2)) # this solves for beta, possible at leaves
 			
 			#Update all relevant eqs with the beta val:
-			elim1 = elim1.subs({b[i,j1]:elim2+b[i,j1]})
-			node.p_eq = node.p_eq.subs({b[i,j1]:elim2+b[i,j1]})
-			node.q_eq = node.q_eq.subs({b[i,j1]:elim2+b[i,j1]})
-			node.parent.p_eq = node.parent.p_eq.subs({b[i,j1]:elim2+b[i,j1]})
-			node.parent.q_eq = node.parent.q_eq.subs({b[i,j1]:elim2+b[i,j1]})
+			if i>=j1: #workaround for skew-symmetry
+				bij1 = b[j1,i]
+			else:
+				bij1 = b[i,j1]
+			elim1 = elim1.subs({bij1:elim2+bij1})
+			node.p_eq = node.p_eq.subs({bij1:elim2+bij1})
+			node.q_eq = node.q_eq.subs({bij1:elim2+bij1})
+			node.parent.p_eq = node.parent.p_eq.subs({bij1:elim2+bij1})
+			node.parent.q_eq = node.parent.q_eq.subs({bij1:elim2+bij1})
 
 			elim.append(elim1)
 			elim.append(elim2)	
