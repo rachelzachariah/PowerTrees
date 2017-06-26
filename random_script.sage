@@ -10,7 +10,7 @@ def write_equations(eqs,filename):
 	for coeff in eqs:
 		str_coeff = str(coeff)
 		disp = disp+str_coeff.replace(' ','') + ';\n'
-	f = open(filename+'_eqs.txt','w')
+	f = open('phc_eqs/'+filename+'_eqs.txt','w')
 	f.write(disp)
 	f.close()
 
