@@ -28,7 +28,7 @@ sage random_script -n N -md M -reps R -w filename
 
 will perform the above process. The only difference is that for 0 <= i <= R-1, it will write the equations of the power system to the file filename_i_eqs.txt". For example:
 
-sage random_script.sage -n 6 -md 5 -reps 2 -filename example
+sage random_script.sage -n 6 -md 5 -reps 2 -w example
 Average time for 6 nodes : 0.0281903902054
 
 Now if we look at our files, we will see the files
