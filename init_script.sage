@@ -11,6 +11,6 @@ for i in range(4):
     	if A[i,j] != 0:
            	B[i,j] = B[j,i] = randint(-10,-1)  
         	G[i,j] = G[j,i] = randint(-10,-1) 
-Q = [0,0,0,0,1,2,3,4,5,6]
+Q = [0,0,0,0,5,6]
 P = [0,0,0,0,0,0,0]
 dirgraph = power_eqs_abr(graph,G,B,Q,P)
