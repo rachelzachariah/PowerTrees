@@ -13,7 +13,7 @@ script_filename = args["s"]
 
 f = open('phc_eqs/'+str(script_filename)+'.sh','w')
 for t in range(reps):
-	f.write('../.././phc -b '+str(phc_filename)+'_'+str(t)+'_eqs.txt '+str(phc_filename)+'_'+str(t)+'_roots.txt')
+	f.write('../.././phc -b '+str(phc_filename)+'_'+str(t)+'_eqs.txt '+str(phc_filename)+'_'+str(t)+'_roots.txt\n')
 
 
 
