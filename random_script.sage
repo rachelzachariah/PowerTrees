@@ -78,7 +78,7 @@ for t in range(reps):
 	if filename != "":
 		write_equations(dirgraph.eqs,filename+"_"+str(t))
 	if grob:
-		#still to do
+		print "Grob"
 	curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 curr_time = curr_time/reps
 print "Average time for "+str(n)+" nodes : "+str(curr_time)
