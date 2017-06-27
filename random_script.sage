@@ -14,17 +14,29 @@ def write_equations(eqs,filename):
 	f.write(disp)
 	f.close()
 
+def bounded_tree(n,max_deg):
+	G = Graph(n)
+	for i in range(1,n):
+		adm_verts = [j for j in range(i) if G.degree(i) < max_deg]
+		r = randint(0,len(adm_verts)-1)
+		k = adm_verts[r]
+		G.add_edge(i,k)
+		G.add_edge(k,i)
+	return G
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-reps', type=int, dest="reps", default = 10)
 parser.add_argument('-n', type=int, dest="n", default = 6)
 parser.add_argument('-md', type=int, dest="md", default = 5)
 parser.add_argument('-w', type=str, dest="w", default = "")
+parser.add_argument('-g',action='store_true', default=False, dest='grobner')
 
 args = vars(parser.parse_args())
 reps = args["reps"]
 n = args["n"]
 max_deg = args["md"]
 filename = args["w"]
+grob = args["grobner"]
 
 load('power_eqs_ar.sage')
 load('DirGraph.sage')
@@ -34,13 +46,17 @@ load('elimVars.sage')
 #for n in range(4,11):
 times = []
 
+if grob:
+	grob_time = 0
+
 curr_time = 0
 for t in range(reps):
-	found = False
-	while found == False:
-		G = graphs.RandomTree(n)
-		if max(G.degree()) <= max_deg:
-			found = True	
+	G = bounded_tree(n,max_deg)
+	# found = False
+	# while found == False:
+	# 	G = graphs.RandomTree(n)
+	# 	if max(G.degree()) <= max_deg:
+	# 		found = True	
 
 	gd = G.degree()
 	max_gd = max(gd)
@@ -61,6 +77,8 @@ for t in range(reps):
 	dirgraph = power_eqs_ar(G,Q,B,P=P_values)
 	if filename != "":
 		write_equations(dirgraph.eqs,filename+"_"+str(t))
+	if grob:
+		#still to do
 	curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 curr_time = curr_time/reps
 print "Average time for "+str(n)+" nodes : "+str(curr_time)
