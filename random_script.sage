@@ -1,4 +1,8 @@
 import argparse
+import signal
+
+def handler(signum, frame):
+	raise Exception("Process is taking too long")
 
 def solve_eqs(dirgraph):
 	final_eqs = altElim(dirgraph,dirgraph.nodes[0])
@@ -50,6 +54,8 @@ if grob:
 	grob_time = 0
 
 curr_time = 0
+bad = 0
+
 for t in range(reps):
 	G = bounded_tree(n,max_deg)
 	# found = False
@@ -79,6 +85,15 @@ for t in range(reps):
 		write_equations(dirgraph.eqs,filename+"_"+str(t))
 	if grob:
 		print "Grob"
-	curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
-curr_time = curr_time/reps
-print "Average time for "+str(n)+" nodes : "+str(curr_time)
+
+
+	signal.signal(signal.SIGALRM, handler)	
+	signal.alarm(600)
+	try:
+		curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
+		times.append(curr_time)
+	except Exception, exc:
+		bad += 1
+
+print str(n)+" nodes : "+str(times)
+print "Failed executions : " + str(bad)
