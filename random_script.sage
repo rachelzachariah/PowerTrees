@@ -54,7 +54,7 @@ if grob:
 	grob_time = 0
 
 curr_time = 0
-bad = 0
+bad = []
 
 for t in range(reps):
 	G = bounded_tree(n,max_deg)
@@ -90,10 +90,10 @@ for t in range(reps):
 	signal.signal(signal.SIGALRM, handler)	
 	signal.alarm(600)
 	try:
-		curr_time += timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
+		curr_time = timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 		times.append(curr_time)
 	except Exception, exc:
-		bad += 1
+		bad.append(t)
 
 print str(n)+" nodes : "+str(times)
 print "Failed executions : " + str(bad)
