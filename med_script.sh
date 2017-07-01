@@ -1,0 +1,14 @@
+sage random_script.sage -n 3 -md 2 -reps 10 -w medn3md2
+sage random_script.sage -n 4 -md 2 -reps 10 -w medn4md2
+sage random_script.sage -n 5 -md 3 -reps 10 -w medn5md3
+sage random_script.sage -n 6 -md 3 -reps 10 -w medn6md3
+sage random_script.sage -n 7 -md 3 -reps 10 -w medn7md3
+sage random_script.sage -n 8 -md 3 -reps 10 -w medn8md3
+sage random_script.sage -n 9 -md 3 -reps 10 -w medn9md3
+sage random_script.sage -n 10 -md 4 -reps 10 -w medn10md4
+sage random_script.sage -n 11 -md 4 -reps 10 -w medn11md4
+sage random_script.sage -n 12 -md 4 -reps 10 -w medn12md4
+sage random_script.sage -n 12 -md 4 -reps 10 -w medn13md4
+sage random_script.sage -n 12 -md 4 -reps 10 -w medn14md4
+sage random_script.sage -n 12 -md 4 -reps 10 -w medn15md4
+sage random_script.sage -n 12 -md 4 -reps 10 -w medn16md4
