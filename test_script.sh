@@ -1,6 +1,6 @@
 sage random_script.sage -n 3 -md 2 -reps 10 -w n3md2
 sage random_script.sage -n 4 -md 3 -reps 10 -w n4md3
-sage random_script.sage -n 4 -md 5 -reps 10 -w n5md4
+sage random_script.sage -n 5 -md 5 -reps 10 -w n5md4
 sage random_script.sage -n 6 -md 5 -reps 10 -w n6md5
 sage random_script.sage -n 7 -md 6 -reps 10 -w n7md6
 sage random_script.sage -n 8 -md 7 -reps 10 -w n8md7
@@ -8,3 +8,7 @@ sage random_script.sage -n 9 -md 8 -reps 10 -w n9md8
 sage random_script.sage -n 10 -md 9 -reps 10 -w n10md9
 sage random_script.sage -n 11 -md 10 -reps 10 -w n11md10
 sage random_script.sage -n 12 -md 11 -reps 10 -w n12md11
+sage random_script.sage -n 13 -md 12 -reps 10 -w n13md12
+sage random_script.sage -n 14 -md 13 -reps 10 -w n14md13
+sage random_script.sage -n 15 -md 14 -reps 10 -w n15md14
+sage random_script.sage -n 16 -md 15 -reps 10 -w n16md15
