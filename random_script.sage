@@ -45,12 +45,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-reps', type=int, dest="reps", default = 10)
 parser.add_argument('-n', type=int, dest="n", default = 6)
 parser.add_argument('-md', type=int, dest="md", default = 5)
+parser.add_argument('-a', type=int, dest="alarm_val", default=200)
 parser.add_argument('-w', type=str, dest="w", default = "")
 parser.add_argument('-g',action='store_true', default=False, dest='grobner')
 
 args = vars(parser.parse_args())
 reps = args["reps"]
 n = args["n"]
+alarm_val = args["alarm_val"]
 max_deg = args["md"]
 filename = args["w"]
 grob = args["grobner"]
@@ -97,7 +99,7 @@ for t in range(reps):
 
 
 	signal.signal(signal.SIGALRM, handler)	
-	signal.alarm(200)
+	signal.alarm(alarm_val)
 	try:
 		if grob:
 			curr_time = timeit('find_ideal(dirgraph)',seconds=True,repeat=1)
