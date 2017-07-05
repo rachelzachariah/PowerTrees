@@ -113,7 +113,7 @@ for t in range(reps):
 			bad.append(t)
 		signal.alarm(0)
 
-		if gu:
+		if gu==True:
 			signal.signal(signal.SIGALRM, handler)	
 			signal.alarm(alarm_val)
 			try:
@@ -139,7 +139,7 @@ for t in range(reps):
 if grob:
 	print str(n)+" nodes elim : "+str(times)
 	print "Failed executions : " + str(bad)
-	if !gu:
+	if gu==False:
 		print str(n)+" nodes Grobner : "+str(grob_times)
 		print "Failed Grobner executions : "+str(bad_grob)
 else:
