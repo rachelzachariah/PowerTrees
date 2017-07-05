@@ -112,8 +112,9 @@ for t in range(reps):
 		except Exception, exc:
 			bad.append(t)
 		signal.alarm(0)
-
-		if gu==True:
+		times.append(curr_time)
+		
+		if gu==False:
 			signal.signal(signal.SIGALRM, handler)	
 			signal.alarm(alarm_val)
 			try:
@@ -121,7 +122,6 @@ for t in range(reps):
 			except Exception, exc:
 				bad_grob.append(t)	
 			signal.alarm(0)			
-			times.append(curr_time)
 			grob_times.append(grob_time)
 
 	else:
