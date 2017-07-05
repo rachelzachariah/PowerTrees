@@ -102,11 +102,11 @@ for t in range(reps):
 	signal.alarm(alarm_val)
 	try:
 		if grob:
-			curr_time = timeit('find_ideal(dirgraph)',seconds=True,repeat=1)
-			grob_time = timeit('grob_ideal(dirgraph)',seconds=True,repeat=1)
+			curr_time = timeit('find_ideal(dirgraph)',seconds=True,number=1)
+			grob_time = timeit('grob_ideal(dirgraph)',seconds=True,number=1)
 			grob_times.append(grob_time)
 		else:
-			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
+			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,number=1)
 		times.append(curr_time)
 	except Exception, exc:
 		bad.append(t)
