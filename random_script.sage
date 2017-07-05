@@ -4,6 +4,10 @@ import signal
 def handler(signum, frame):
 	raise Exception("Process is taking too long")
 
+def find_ideal(dirgraph):
+	final_eqs = altElim(dirgraph,dirgraph.nodes[0])
+	return final_eqs
+
 def solve_eqs(dirgraph):
 	final_eqs = altElim(dirgraph,dirgraph.nodes[0])
 	solutions = alt_solve(dirgraph,dirgraph.nodes[0],tol=1.0e-3)
@@ -50,9 +54,6 @@ load('elimVars.sage')
 #for n in range(4,11):
 times = []
 
-if grob:
-	grob_time = 0
-
 curr_time = 0
 bad = []
 
@@ -83,17 +84,20 @@ for t in range(reps):
 	dirgraph = power_eqs_ar(G,Q,B,P=P_values)
 	if filename != "":
 		write_equations(dirgraph.eqs,filename+"_"+str(t))
-	if grob:
-		print "Grob"
 
 
 	signal.signal(signal.SIGALRM, handler)	
-	signal.alarm(600)
+	signal.alarm(60)
 	try:
-		curr_time = timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
+		if grob:
+			curr_time = timeit('find_ideal(dirgraph)',seconds=True,repeat=1)
+		else:
+			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 		times.append(curr_time)
 	except Exception, exc:
 		bad.append(t)
+		times.append(-1)
+	signal.alarm(0)
 
 print str(n)+" nodes : "+str(times)
 print "Failed executions : " + str(bad)
