@@ -50,6 +50,7 @@ parser.add_argument('-md', type=int, dest="md", default = 5)
 parser.add_argument('-a', type=int, dest="alarm_val", default=60)
 parser.add_argument('-w', type=str, dest="w", default = "")
 parser.add_argument('-g',action='store_true', default=False, dest='grobner')
+parser.add_argument('-u',action='store_true', default=False, dest='grobner_undo')
 
 args = vars(parser.parse_args())
 reps = args["reps"]
@@ -58,6 +59,7 @@ alarm_val = args["alarm_val"]
 max_deg = args["md"]
 filename = args["w"]
 grob = args["grobner"]
+gu = args["grobner_undo"]
 
 load('power_eqs_ar.sage')
 load('DirGraph.sage')
@@ -111,15 +113,16 @@ for t in range(reps):
 			bad.append(t)
 		signal.alarm(0)
 
-		signal.signal(signal.SIGALRM, handler)	
-		signal.alarm(alarm_val)
-		try:
-			grob_time = timeit('grob_ideal(dirgraph)',seconds=True,number=1)
-		except Exception, exc:
-			bad_grob.append(t)	
-		signal.alarm(0)			
-		times.append(curr_time)
-		grob_times.append(grob_time)
+		if gu:
+			signal.signal(signal.SIGALRM, handler)	
+			signal.alarm(alarm_val)
+			try:
+				grob_time = timeit('grob_ideal(dirgraph)',seconds=True,number=1)
+			except Exception, exc:
+				bad_grob.append(t)	
+			signal.alarm(0)			
+			times.append(curr_time)
+			grob_times.append(grob_time)
 
 	else:
 		signal.signal(signal.SIGALRM, handler)	
@@ -133,8 +136,12 @@ for t in range(reps):
 		times.append(curr_time)
 
 
-print str(n)+" nodes : "+str(times)
-print "Failed executions : " + str(bad)
 if grob:
-	print str(n)+" nodes Grobner : "+str(grob_times)
-	print "Failed Grobner executions : "+str(bad_grob)
+	print str(n)+" nodes elim : "+str(times)
+	print "Failed executions : " + str(bad)
+	if !gu:
+		print str(n)+" nodes Grobner : "+str(grob_times)
+		print "Failed Grobner executions : "+str(bad_grob)
+else:
+	print str(n)+" nodes : "+str(times)
+	print "Failed executions : " + str(bad)
