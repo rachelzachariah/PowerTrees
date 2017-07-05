@@ -1,5 +1,7 @@
 import argparse
 import signal
+from multiprocessing import Process
+from time import sleep
 
 def handler(signum, frame):
 	raise Exception("Process is taking too long")
@@ -68,6 +70,7 @@ grob_times = []
 
 curr_time = 0
 bad = []
+bad_grob = []
 
 for t in range(reps):
 	G = bounded_tree(n,max_deg)
@@ -97,25 +100,41 @@ for t in range(reps):
 	if filename != "":
 		write_equations(dirgraph.eqs,filename+"_"+str(t))
 
-
-	signal.signal(signal.SIGALRM, handler)	
-	signal.alarm(alarm_val)
-	try:
-		if grob:
+	if grob:
+		signal.signal(signal.SIGALRM, handler)	
+		signal.alarm(alarm_val)
+		curr_time = -1
+		grob_time = -1
+		try:
 			curr_time = timeit('find_ideal(dirgraph)',seconds=True,number=1)
+		except Exception, exc:
+			bad.append(t)
+		signal.alarm(0)
+
+		signal.signal(signal.SIGALRM, handler)	
+		signal.alarm(alarm_val)
+		try:
 			grob_time = timeit('grob_ideal(dirgraph)',seconds=True,number=1)
-			grob_times.append(grob_time)
-		else:
-			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,number=1)
+		except Exception, exc:
+			bad_grob.append(t)	
+		signal.alarm(0)			
 		times.append(curr_time)
-	except Exception, exc:
-		bad.append(t)
-		times.append(-1)
-		if grob:
-			grob_times.append(-1)
-	signal.alarm(0)
+		grob_times.append(grob_time)
+
+	else:
+		signal.signal(signal.SIGALRM, handler)	
+		signal.alarm(alarm_val)
+		curr_time = -1
+		try:		
+			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,number=1)
+		except Exception, exc:
+			bad_grob.append(t)	
+		signal.alarm(0)	
+		times.append(curr_time)
+
 
 print str(n)+" nodes : "+str(times)
+print "Failed executions : " + str(bad)
 if grob:
 	print str(n)+" nodes Grobner : "+str(grob_times)
-print "Failed executions : " + str(bad)
+	print "Failed Grobner executions : "+str(bad_grob)
