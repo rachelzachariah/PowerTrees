@@ -8,6 +8,15 @@ def find_ideal(dirgraph):
 	final_eqs = altElim(dirgraph,dirgraph.nodes[0])
 	return final_eqs
 
+def grob_ideal(dirgraph):
+	S = dirgraph.S
+	v = S.gens()
+	eqs = dirgraph.eqs
+	m = len(dirgraph.nodes[0].children)
+	I = S.ideal(eqs)
+	J = I.elimination_ideal(v[m:])
+	return J
+
 def solve_eqs(dirgraph):
 	final_eqs = altElim(dirgraph,dirgraph.nodes[0])
 	solutions = alt_solve(dirgraph,dirgraph.nodes[0],tol=1.0e-3)
@@ -53,6 +62,7 @@ load('elimVars.sage')
 
 #for n in range(4,11):
 times = []
+grob_times = []
 
 curr_time = 0
 bad = []
@@ -87,17 +97,23 @@ for t in range(reps):
 
 
 	signal.signal(signal.SIGALRM, handler)	
-	signal.alarm(60)
+	signal.alarm(200)
 	try:
 		if grob:
 			curr_time = timeit('find_ideal(dirgraph)',seconds=True,repeat=1)
+			grob_time = timeit('grob_ideal(dirgraph)',seconds=True,repeat=1)
+			grob_times.append(grob_time)
 		else:
 			curr_time = timeit('solve_eqs(dirgraph)',seconds=True,repeat=1)
 		times.append(curr_time)
 	except Exception, exc:
 		bad.append(t)
 		times.append(-1)
+		if grob:
+			grob_times.append(-1)
 	signal.alarm(0)
 
 print str(n)+" nodes : "+str(times)
+if grob:
+	print str(n)+" nodes Grobner : "+str(grob_times)
 print "Failed executions : " + str(bad)
