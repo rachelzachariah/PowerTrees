@@ -20,5 +20,5 @@ for a in range(a1,a2+1):
 	for t in range(reps):
 		for j in range(m):
 			md = a-1
-			base_name = 'ln'+str(a)+'md'+str(md)
+			base_name = 'hn'+str(a)+'md'+str(md)
 			f.write('../.././phc -b '+base_name+'_'+str(t)+'_eqs.txt '+base_name+'_'+str(t)+'_roots'+str(j)+'.txt\n')
