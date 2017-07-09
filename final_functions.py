@@ -7,7 +7,7 @@ def low_grep():
 		for t in range(10):
 			base_name = 'ln'+str(a)+'md'+str(md)+'_'+str(t)
 			for j in range(5):
-				f.write('grep "User time in seconds" '+base_name+'_'+str(t)+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
+				f.write('grep "User time in seconds" '+base_name+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
 	f.close()
 
 def med_grep():
@@ -17,7 +17,7 @@ def med_grep():
 		for t in range(10):
 			base_name = 'ln'+str(a)+'md'+str(md)+'_'+str(t)
 			for j in range(5):
-				f.write('grep "User time in seconds" '+base_name+'_'+str(t)+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
+				f.write('grep "User time in seconds" '+base_name+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
 	f.close()
 
 def high_grep():
@@ -27,7 +27,7 @@ def high_grep():
 		for t in range(10):
 			base_name = 'ln'+str(a)+'md'+str(md)+'_'+str(t)
 			for j in range(5):
-				f.write('grep "User time in seconds" '+base_name+'_'+str(t)+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
+				f.write('grep "User time in seconds" '+base_name+'_roots'+str(j)+'.txt > '+str(base_name)+'_time'+str(j)+'.txt\n')
 	f.close()	
 
 
